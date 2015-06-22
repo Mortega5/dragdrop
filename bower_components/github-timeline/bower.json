@@ -1,0 +1,17 @@
+{
+  "name": "github-events",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Mortega5/github-events",
+  "authors": [
+    "Miguel Ortega Moreno <miguel.ortega.moreno5@gmail.com>"
+  ],
+  "description": "Componente polymer que muestra los eventos de github de un usuario",
+  "main": "github-events.html",
+  "license": "Apache",
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.4",
+    "core-ajax": "Polymer/core-ajax#~0.5.6",
+    "core-icons": "Polymer/core-icons#~0.5.6",
+    "paper-shadow": "Polymer/paper-shadow#~0.5.6"
+  }
+}

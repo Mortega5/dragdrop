@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Drag & Drop</title>
+    <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+
+    <link rel="import" href="element/elements.html">
+    <link rel="stylesheet" href="index.css">
+
+  </head>
+  <body onMouseMove="coordenadas(event)">
+    <div ondrop="soltarObjeto(event)" ondragover="entraArrastre(event)" ondragleave="quitarSombras(event)" ondragenter="mostrarSombra(event)" id="container">
+
+    </div>
+    <div id="list">
+      <ul>
+        <li ondragstart="comienzo(event)" id="drag1" draggable="true">timeline</li>
+        <li id="x"></li>
+        <li id="y"></li>
+        <li id="pagex"></li>
+        <li id="pagey"></li>
+      </ul>
+    </div>
+
+
+    <script>
+
+      /* Se ejecuta en el elemento arrastrado cuando comienza*/ 
+      function comienzo(evento) {
+        evento.dataTransfer.setData("element","github-events");
+
+        var imagen = document.createElement('img');
+        imagen.src = "http://icons.iconarchive.com/icons/designbolts/despicable-me-2/128/Minion-Amazed-icon.png";
+        event.dataTransfer.setDragImage(imagen,0,0);
+        var container = document.querySelector('#container')
+        container.style.boxShadow = "5px 5px 5px solid black";
+      };
+      /* Se ejecuta cuando el elemento arrastrado entra en contacto con el container */
+      function entraArrastre(evento){
+        evento.preventDefault();
+      };
+
+      /* Se ejecuta cando el elemento arrastrado se suelta sobre el container*/
+      function soltarObjeto(evento){
+        evento.preventDefault();
+        event.target.style.transition = "";
+        event.target.style.boxShadow = "";
+
+        var id = evento.dataTransfer.getData("element");
+        if (id && document.getElementsByTagName(id).length === 0){
+          var element;
+          element = document.createElement(id);
+          element.setAttribute("username", "mortega5");
+          element.setAttribute('draggable', true)
+          element.setAttribute('ondragend',"finDrag(event)");
+          element.setAttribute('ondrag', 'arrastrando(event)');
+
+
+          element.setAttribute('ondragstart', "prueba(event)");
+          element.style.position = "absolute";
+
+          element.style.top = (event.pageY ) + "px";
+          element.style.left = (event.pageX) + "px";
+
+          event.target.appendChild(element);
+        }
+      };
+      function prueba (event) {
+        var img =document.createElement('img');
+        img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        var imagen = document.createElement('img');
+        imagen.src = "http://icons.iconarchive.com/icons/designbolts/despicable-me-2/128/Minion-Amazed-icon.png";
+        event.dataTransfer.setDragImage(img,0,0);
+      };
+      /* Se ejecuta cuando se suelta un elemento (se deja de pulsar el boton) */
+      function finDrag(event){
+        var element;
+        element = event.target;
+        element.style.left = (event.pageX - 65) + "px";
+        element.style.top = (event.pageY -25) + "px";
+
+      };
+      /* Muestra sombra cuando se intenta arrastrar un objeto */
+      function mostrarSombra(event) {
+        event.target.style.transition = "all 0.2s";
+        event.target.style.boxShadow = "0px 0px 10px black";
+      };
+      /* Quita las sombras */
+      function quitarSombras(event) {
+        event.target.style.transition = "";
+        event.target.style.boxShadow = "";
+      };
+
+      /* Monitoriza las cordenadas del raton */
+      function coordenadas(evento) {
+        var x = document.querySelector('#x').innerHTML = evento.clientX; 
+        var y = document.querySelector('#y').innerHTML = evento.clientY;
+        var x = document.querySelector('#pagex').innerHTML = evento.pageX; 
+        var y = document.querySelector('#pagey').innerHTML = evento.pageY;
+      };
+
+      function arrastrando(event) {
+        var x = event.clientX - event.target.offsetLeft;
+        var y = event.clientY - event.target.offsetTop;
+        event.target.style.transform = 
+          event.target.style.webkitTransform = 
+          'translate(' + x+ 'px, ' + y+ 'px)';
+      };
+
+    </script>
+  </body>
+</html>

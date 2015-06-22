@@ -1,0 +1,18 @@
+#container {
+  background-color: aqua;
+  border: 1px solid black;
+  width: 80%;
+  height: 800px;
+  float: left;
+  display: inline-block;
+}
+#list {
+  float: right;
+  display: inline-block;
+
+  width: 19%;
+  border: 1px solid black;
+  height: 100px;
+  background-color: firebrick;
+  color: white;
+}

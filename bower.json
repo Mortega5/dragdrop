@@ -1,0 +1,19 @@
+{
+  "name": "drag-drop",
+  "version": "0.0.1",
+  "authors": [
+    "Miguel Ortega Moreno <miguel.ortega.moreno5@gmail.com>"
+  ],
+  "directoy": "bower_components",
+  "description": "prueba de drag and drop",
+  "main": "index.html",
+  "license": "MIT",
+  "homepage": "localhost:8080",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
