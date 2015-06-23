@@ -42,8 +42,8 @@ modulo.directive('arrastrar', function(){
         event.dataTransfer.setDragImage(img,20,20);
       }
     }/* end if */
-    element.on('drag', arrastrando);
-    element.on('dragstart', deleteShadow);
+    element.on('drag', scope.arrastrando);
+    element.on('dragstart', scope.deleteShadow);
 
   };
   return {link: link};
@@ -62,16 +62,17 @@ modulo.directive('container',function () {
 
         var id = evento.dataTransfer.getData("element");
         if (id && document.getElementsByTagName(id).length === 0){
-          var element;
-          element = document.createElement(id);
-          element.setAttribute("arrastrar","");
-          element.setAttribute('username', "mortega5");
-          element.style.position = "absolute";
+          var newTimeline;
+          newTimeline = angular.element('<' + id + '/>')
+          newTimeline.attr("arrastrar","");
+          newTimeline.attr('username', "mortega5");
+          newTimeline.css({
+            position: 'absolute',
+            top: (event.pageY ) + "px",
+            left: (event.pageX) + "px"
+          });
+          element.append(newTimeline);
 
-          element.style.top = (event.pageY ) + "px";
-          element.style.left = (event.pageX) + "px";
-
-          event.target.appendChild(element);
         }
       }
     };/* end if */
