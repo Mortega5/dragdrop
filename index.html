@@ -9,26 +9,23 @@
     <link rel="stylesheet" href="index.css">
 
   </head>
-  <body onMouseMove="coordenadas(event)">
-    <div ondrop="soltarObjeto(event)" ondragover="entraArrastre(event)" ondragleave="quitarSombras(event)" ondragenter="mostrarSombra(event)" id="container">
+  <body ng-app="prueba">
+    <div id="container" container>
 
     </div>
     <div id="list">
       <ul>
-        <li ondragstart="comienzo(event)" id="drag1" draggable="true">timeline</li>
-        <li id="x"></li>
-        <li id="y"></li>
-        <li id="pagex"></li>
-        <li id="pagey"></li>
+        <li addelement id="github-events">timeline</li>
+        <li id="twitter-timeline" id="twitter-timeline" addelement>timeline</li>
       </ul>
     </div>
 
-
+    <script src="bower_components/angularjs/angular.min.js"></script>
+    <script src="scripts/app.js"></script>
     <script>
-
       /* Se ejecuta en el elemento arrastrado cuando comienza*/ 
       function comienzo(evento) {
-        evento.dataTransfer.setData("element","github-events");
+        evento.dataTransfer.setData("element",evento.target.id);
 
         var imagen = document.createElement('img');
         imagen.src = "http://icons.iconarchive.com/icons/designbolts/despicable-me-2/128/Minion-Amazed-icon.png";
@@ -38,12 +35,15 @@
       };
       /* Se ejecuta cuando el elemento arrastrado entra en contacto con el container */
       function entraArrastre(evento){
+
         evento.preventDefault();
       };
 
       /* Se ejecuta cando el elemento arrastrado se suelta sobre el container*/
       function soltarObjeto(evento){
+
         evento.preventDefault();
+        evento.stopPropagation();
         event.target.style.transition = "";
         event.target.style.boxShadow = "";
 
@@ -51,13 +51,8 @@
         if (id && document.getElementsByTagName(id).length === 0){
           var element;
           element = document.createElement(id);
-          element.setAttribute("username", "mortega5");
-          element.setAttribute('draggable', true)
-          element.setAttribute('ondragend',"finDrag(event)");
-          element.setAttribute('ondrag', 'arrastrando(event)');
-
-
-          element.setAttribute('ondragstart', "prueba(event)");
+          element.setAttribute("arrastrar","");
+          element.setAttribute('username', "mortega5");
           element.style.position = "absolute";
 
           element.style.top = (event.pageY ) + "px";
@@ -66,12 +61,12 @@
           event.target.appendChild(element);
         }
       };
-      function prueba (event) {
+      function deleteShadow (event) {
         var img =document.createElement('img');
         img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
         var imagen = document.createElement('img');
         imagen.src = "http://icons.iconarchive.com/icons/designbolts/despicable-me-2/128/Minion-Amazed-icon.png";
-        event.dataTransfer.setDragImage(img,0,0);
+        event.dataTransfer.setDragImage(img,20,20);
       };
       /* Se ejecuta cuando se suelta un elemento (se deja de pulsar el boton) */
       function finDrag(event){
@@ -83,11 +78,15 @@
       };
       /* Muestra sombra cuando se intenta arrastrar un objeto */
       function mostrarSombra(event) {
-        event.target.style.transition = "all 0.2s";
-        event.target.style.boxShadow = "0px 0px 10px black";
+        event.preventDefault();
+        if (event.target.id == 'container') {
+          event.target.style.transition = "all 0.2s";
+          event.target.style.boxShadow = "0px 0px 10px black";
+        }
       };
       /* Quita las sombras */
       function quitarSombras(event) {
+        event.preventDefault();
         event.target.style.transition = "";
         event.target.style.boxShadow = "";
       };
@@ -99,15 +98,24 @@
         var x = document.querySelector('#pagex').innerHTML = evento.pageX; 
         var y = document.querySelector('#pagey').innerHTML = evento.pageY;
       };
-
       function arrastrando(event) {
-        var x = event.clientX - event.target.offsetLeft;
-        var y = event.clientY - event.target.offsetTop;
-        event.target.style.transform = 
-          event.target.style.webkitTransform = 
-          'translate(' + x+ 'px, ' + y+ 'px)';
-      };
+        var x = (event.clientX - event.target.offsetLeft - (event.target.offsetWidth/2));
+        var y = (event.clientY - event.target.offsetTop - 15);
+        var z = 100;
+        var newPosition = {};
+        newPosition.left = event.target.offsetLeft + x;
+        newPosition.right = event.target.offsetLeft + x + event.target.offsetWidth;
+        newPosition.top = event.target.offsetTop + y;
+        newPosition.bottom = event.target.offsetTop + y + event.target.offsetHeight;
 
+        var container = document.querySelector('#container')
+        if (container.offsetLeft < newPosition.left && container.offsetWidth + container.offsetLeft > newPosition.right &&
+            container.offsetTop < newPosition.top && container.offsetHeight + container.offsetTop > newPosition.bottom ){
+          event.target.style.transform = 
+            event.target.style.webkitTransform = 
+            'translate3d(' + x + 'px, ' + y + 'px,' + z + 'px)';
+        } 
+      }
     </script>
   </body>
 </html>
