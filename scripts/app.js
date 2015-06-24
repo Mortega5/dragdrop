@@ -14,11 +14,14 @@ modulo.directive('ngDrag', function () {
   function link(scope, element, attrs) {
     //Indicamos que es arrastrable 
     element.attr('draggable', "true");
-
+    scope.move = {};
     // Hace el efecto de arrastrarse cuando se mueve el elemento
     scope.dragging = function (event) {
       // Calculamos la cantidad de movimiento que ha sufrido el objeto
       var x, y, newPosition, container;
+      scope.move.x = scope.move.x || event.clientX - event.target.offsetLeft;
+      scope.move.y = scope.move.y || event.clientY - event.target.offsetTop;
+      
       x = (event.clientX - event.target.offsetLeft - (event.target.offsetWidth / 2));
       y = (event.clientY - event.target.offsetTop - 15);
 
@@ -90,8 +93,11 @@ modulo.directive('ngContainer', function () {
         if (attributes) {
           attributes = JSON.parse(attributes);
           var key;
+
           for (key in attributes) {
-            newTimeline.attr(key, attributes[key]);
+            if (attributes.hasOwnProperty(key)) {
+              newTimeline.attr(key, attributes[key]);
+            }
           }
         }
         /* Caracteristicas del estilo para arrastrarlo */
@@ -142,7 +148,7 @@ modulo.directive('ngCreateElement', function () {
 
     scope.comienzo = function (evento) {
       evento.dataTransfer.setData("element", evento.target.id);
-      
+
       /* Pasamos los atributos del timeline */
       if (scope.attributes) {
         evento.dataTransfer.setData("attributes", scope.attributes);
@@ -150,7 +156,7 @@ modulo.directive('ngCreateElement', function () {
 
       var image, container;
       image = document.createElement('img');
-      
+
       image.src = scope.imagesrc || '';
       event.dataTransfer.setDragImage(image, 0, 0);
       container = document.querySelector('#container');
