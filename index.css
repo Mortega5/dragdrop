@@ -3,6 +3,7 @@
   border: 1px solid black;
   width: 80%;
   height: 800px;
+  margin: 40px;
   float: left;
   display: inline-block;
 }
@@ -10,7 +11,7 @@
   float: right;
   display: inline-block;
 
-  width: 19%;
+  width: 10%;
   border: 1px solid black;
   height: 100px;
   background-color: firebrick;

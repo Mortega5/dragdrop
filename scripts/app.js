@@ -1,8 +1,9 @@
+/*global angular, document*/
 var modulo = angular.module('prueba', []);
 
 modulo.controller('MainCtrl', function ($scope) {
   'use strict';
-  $scope.prueba = "hola";
+  $scope.prueba = 'hola';
 });
 
 /**
@@ -11,42 +12,59 @@ modulo.controller('MainCtrl', function ($scope) {
   */
 modulo.directive('ngDrag', function () {
   'use strict';
-  function link(scope, element, attrs) {
+  function link(scope, element) {
     //Indicamos que es arrastrable 
-    element.attr('draggable', "true");
+    element.attr('draggable', 'true');
     scope.move = {};
     // Hace el efecto de arrastrarse cuando se mueve el elemento
     scope.dragging = function (event) {
       // Calculamos la cantidad de movimiento que ha sufrido el objeto
-      var x, y, newPosition, container;
-      scope.move.x = scope.move.x || event.clientX - event.target.offsetLeft;
-      scope.move.y = scope.move.y || event.clientY - event.target.offsetTop;
+      var x, y, newPosition, container, padding = {}, into = {};
+      if (event.clientX !== 0 && event.clientY !== 0) {
+        scope.move.x = scope.move.x || event.clientX - event.target.offsetLeft;
+        scope.move.y = scope.move.y || event.clientY - event.target.offsetTop;
 
-      x = (event.clientX - event.target.offsetLeft - scope.move.x);
-      y = (event.clientY - event.target.offsetTop - scope.move.y);
-      
+        x = (event.clientX - event.target.offsetLeft - scope.move.x);
+        y = (event.clientY - event.target.offsetTop - scope.move.y);
 
-      // Calculamos las posiciones relativas de cada lado para calcular los limites
-      newPosition = {};
-      newPosition.left = event.target.offsetLeft + x;
-      newPosition.right = event.target.offsetLeft + x + event.target.offsetWidth;
-      newPosition.top = event.target.offsetTop + y;
-      newPosition.bottom = event.target.offsetTop + y + event.target.offsetHeight;
-      
-      /* Buscamos el elemento contenedor del objeto */
-      container = document.querySelector('#container');
 
-      /* Comparamos los limites de ambos elementos para saber si esta dentro */
-      
-      if (container.offsetLeft < newPosition.left && container.offsetWidth + container.offsetLeft > newPosition.right &&
-          container.offsetTop < newPosition.top && container.offsetHeight + container.offsetTop > newPosition.bottom) {
+        // Calculamos las posiciones relativas de cada lado para calcular los limites
+        newPosition = {};
+        newPosition.left = event.target.offsetLeft + x;
+        newPosition.right = event.target.offsetLeft + x + event.target.offsetWidth;
+        newPosition.top = event.target.offsetTop + y;
+        newPosition.bottom = event.target.offsetTop + y + event.target.offsetHeight;
 
+        /* Buscamos el elemento contenedor del objeto */
+        container = document.querySelector('#container');
+        
+
+        /* Comparamos los limites de ambos elementos para saber si esta dentro */
+
+        padding.top = angular.element(container).css('padding-top').split('px')[0] || 0;
+        padding.right =angular.element(container).css('padding-right').split('px')[0] || 0;
+        padding.bottom = angular.element(container).css('padding-bottom').split('px')[0] || 0;
+        padding.left = angular.element(container).css('padding-left').split('px')[0] || 0;
+
+        
+
+        into.left = container.offsetLeft + padding.left < newPosition.left;
+        into.right = container.offsetWidth + container.offsetLeft - padding.right > newPosition.right;
+        into.top = container.offsetTop + padding.top < newPosition.top;
+        into.bottom = container.offsetHeight + container.offsetTop - padding.bottom > newPosition.bottom;
+
+        // top
+        newPosition.top = into.top ? newPosition.top : container.offsetTop + padding.top;
+        // bottom
+        newPosition.top  = into.bottom ? newPosition.top : container.offsetTop + container.offsetHeight - event.target.offsetHeight - padding.bottom;
+        // left
+        newPosition.left = into.left ? newPosition.left : container.offsetLeft + padding.left;
+        // right
+        newPosition.left = into.right ? newPosition.left : container.offsetLeft + container.offsetWidth - event.target.offsetWidth - padding.right;
+
+        // actualizamos la posicion
         event.target.style.top = newPosition.top + 'px';
         event.target.style.left = newPosition.left + 'px';
-
-      } else {
-        event.target.style.top = container.offsetTop + 'px';
-        event.target.style.left = container.offseLeft + 'px';
       }
     };// end function
 
@@ -58,8 +76,8 @@ modulo.directive('ngDrag', function () {
       event.dataTransfer.setDragImage(img, 20, 20);
     };//end function
 
-    
-    scope.deleteMove = function (event) {
+
+    scope.deleteMove = function () {
       scope.move = {};
     };
     // Asociamos los eventos necesarios para producir los efectos
@@ -73,7 +91,7 @@ modulo.directive('ngDrag', function () {
 
 modulo.directive('ngContainer', function () {
   'use strict';
-  function link(scope, element, attrs) {
+  function link(scope, element) {
 
     /* Funcion a ejecutar cuando se suelta un objeot en el contenedor */
     /* Control de errores (origen desconocido) (?) */
@@ -82,12 +100,12 @@ modulo.directive('ngContainer', function () {
       evento.preventDefault();
       evento.stopPropagation();
       /* Reseteamos el estilo del contenedor (quitamos la sombra) */
-      evento.target.style.transition = "";
-      evento.target.style.boxShadow = "";
+      evento.target.style.transition = '';
+      evento.target.style.boxShadow = '';
 
-      var id, attributes, newTimeline, injector, $compile;
+      var id, attributes, newTimeline, injector, $compile, key;
       /* Cogemos el objeto que tuvo lugar en el intercambio de datos */
-      id = evento.dataTransfer.getData("element");
+      id = evento.dataTransfer.getData('element');
 
       /* Si no esta repetido, lo añadimos al dashboard */
       if (id && document.getElementsByTagName(id).length === 0) {
@@ -97,13 +115,12 @@ modulo.directive('ngContainer', function () {
         /* TODO: parametrizar los attributos para que se le pasen como una lista
          * y que se añadan de manera automatica
          */
-        newTimeline.attr("ng-drag", "");
+        newTimeline.attr('ng-drag', '');
 
         /* Añadimos todos los attributos necesarios */
         attributes = evento.dataTransfer.getData('attributes');
         if (attributes) {
           attributes = JSON.parse(attributes);
-          var key;
 
           for (key in attributes) {
             if (attributes.hasOwnProperty(key)) {
@@ -114,8 +131,8 @@ modulo.directive('ngContainer', function () {
         /* Caracteristicas del estilo para arrastrarlo */
         newTimeline.css({
           position: 'absolute',
-          top: (event.pageY) + "px",
-          left: (event.pageX) + "px"
+          top: (evento.pageY) + 'px',
+          left: (evento.pageX) + 'px'
         });
         /* Enlazamos el elemento al contenedor*/
         element.append(newTimeline);
@@ -133,14 +150,14 @@ modulo.directive('ngContainer', function () {
     /* quitamos las sombras una vez que el elemento no está en el contenedor */
     scope.removeShadow = function (event) {
       event.preventDefault();
-      event.target.style.transition = "";
-      event.target.style.boxShadow = "";
+      event.target.style.transition = '';
+      event.target.style.boxShadow = '';
     };
     /* Mostramos sombra en el contenedor con un pequeño delay (0.2s)*/
     scope.showShadow = function (event) {
       if (event.target.id === 'container') {
-        event.target.style.transition = "boxShadow 0.2s";
-        event.target.style.boxShadow = "0px 0px 10px black";
+        event.target.style.transition = 'boxShadow 0.2s';
+        event.target.style.boxShadow = '0px 0px 10px black';
       }
     };
     /* Enlazamos las funciones con los eventos correspondientes */
@@ -155,27 +172,27 @@ modulo.directive('ngContainer', function () {
 
 modulo.directive('ngCreateElement', function () {
   'use strict';
-  function link(scope, element, attrs) {
+  function link(scope, element) {
 
     scope.comienzo = function (evento) {
-      evento.dataTransfer.setData("element", evento.target.id);
+      evento.dataTransfer.setData('element', evento.target.id);
 
       /* Pasamos los atributos del timeline */
       if (scope.attributes) {
-        evento.dataTransfer.setData("attributes", scope.attributes);
+        evento.dataTransfer.setData('attributes', scope.attributes);
       }
 
       var image, container;
       image = document.createElement('img');
 
       image.src = scope.imagesrc || '';
-      event.dataTransfer.setDragImage(image, 0, 0);
+      evento.dataTransfer.setDragImage(image, 0, 0);
       container = document.querySelector('#container');
-      container.style.boxShadow = "5px 5px 5px solid black";
+      container.style.boxShadow = '5px 5px 5px solid black';
     };
 
     element.attr('draggable', 'true');
     element.on('dragstart', scope.comienzo);
   }
-  return {scope: {imagesrc: "@imagesrc", attributes: '@listAttributes'}, link: link};
+  return {scope: {imagesrc: '@imagesrc', attributes: '@listAttributes'}, link: link};
 });
