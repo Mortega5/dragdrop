@@ -21,9 +21,10 @@ modulo.directive('ngDrag', function () {
       var x, y, newPosition, container;
       scope.move.x = scope.move.x || event.clientX - event.target.offsetLeft;
       scope.move.y = scope.move.y || event.clientY - event.target.offsetTop;
+
+      x = (event.clientX - event.target.offsetLeft - scope.move.x);
+      y = (event.clientY - event.target.offsetTop - scope.move.y);
       
-      x = (event.clientX - event.target.offsetLeft - (event.target.offsetWidth / 2));
-      y = (event.clientY - event.target.offsetTop - 15);
 
       // Calculamos las posiciones relativas de cada lado para calcular los limites
       newPosition = {};
@@ -31,16 +32,21 @@ modulo.directive('ngDrag', function () {
       newPosition.right = event.target.offsetLeft + x + event.target.offsetWidth;
       newPosition.top = event.target.offsetTop + y;
       newPosition.bottom = event.target.offsetTop + y + event.target.offsetHeight;
-
+      
       /* Buscamos el elemento contenedor del objeto */
       container = document.querySelector('#container');
 
       /* Comparamos los limites de ambos elementos para saber si esta dentro */
+      
       if (container.offsetLeft < newPosition.left && container.offsetWidth + container.offsetLeft > newPosition.right &&
           container.offsetTop < newPosition.top && container.offsetHeight + container.offsetTop > newPosition.bottom) {
-        event.target.style.transform =
-          event.target.style.webkitTransform =
-          'translate(' + x + 'px, ' + y + 'px )';
+
+        event.target.style.top = newPosition.top + 'px';
+        event.target.style.left = newPosition.left + 'px';
+
+      } else {
+        event.target.style.top = container.offsetTop + 'px';
+        event.target.style.left = container.offseLeft + 'px';
       }
     };// end function
 
@@ -52,9 +58,14 @@ modulo.directive('ngDrag', function () {
       event.dataTransfer.setDragImage(img, 20, 20);
     };//end function
 
+    
+    scope.deleteMove = function (event) {
+      scope.move = {};
+    };
     // Asociamos los eventos necesarios para producir los efectos
     element.on('drag', scope.dragging);
     element.on('dragstart', scope.deleteShadow);
+    element.on('dragend', scope.deleteMove);
   }
   /* creamos un scope propio */
   return {link: link, scope: true};
